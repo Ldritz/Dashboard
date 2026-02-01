@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import { Activity, CheckCircle, Clock, Plus, Trash2, User, Bot, RefreshCw, Cpu, Shield, Zap } from "lucide-react";
+import JarvisCore from "./JarvisCore";
 
 type Task = {
   id: number;
@@ -145,20 +146,17 @@ export default function Dashboard() {
               <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-500"></div>
               <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500"></div>
 
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <div className="p-3 rounded-none border border-cyan-500 bg-cyan-500/10 text-cyan-400">
-                    <Bot size={24} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold tracking-widest text-cyan-700">SYSTEM // JARVIS</h3>
-                    <p className="text-xs text-neutral-500 mt-1">V 2.4.0 // ACTIVE</p>
-                  </div>
-                </div>
-                <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></div>
-              </div>
-              <div className="border-t border-cyan-900/30 pt-4">
-                <p className="text-xl font-light text-cyan-100 tracking-wide uppercase">"{jarvisStatus.status_text}"</p>
+              <div className="flex flex-col md:flex-row items-center gap-6 mb-4">
+                 <div className="shrink-0">
+                    <JarvisCore />
+                 </div>
+                 <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-sm font-bold tracking-[0.2em] text-cyan-500 border-b border-cyan-900/50 pb-2 mb-2 inline-block">SYSTEM CORE // JARVIS</h3>
+                    <p className="text-xs text-cyan-800 font-mono mb-4">NEURAL INTERFACE V2.4.0</p>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/30 border border-cyan-900/50 text-cyan-300 text-xs tracking-wider">
+                       <Activity size={12} /> {jarvisStatus.status_text.toUpperCase()}
+                    </div>
+                 </div>
               </div>
            </div>
         </section>
