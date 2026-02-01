@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase";
-import { Activity, CheckCircle, Clock, Plus, Trash2, User, Bot, RefreshCw } from "lucide-react";
+import { Activity, CheckCircle, Clock, Plus, Trash2, User, Bot, RefreshCw, Cpu, Shield, Zap } from "lucide-react";
 
 type Task = {
   id: number;
@@ -31,7 +31,6 @@ export default function Dashboard() {
   useEffect(() => {
     fetchData();
 
-    // Real-time subscription
     const taskChannel = supabase
       .channel('public:tasks')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, fetchData)
@@ -62,7 +61,7 @@ export default function Dashboard() {
     if (!newTask.trim()) return;
     await supabase.from("tasks").insert([{ title: newTask, assignee, status: "pending" }]);
     setNewTask("");
-    fetchData(); // Optimistic update fallback
+    fetchData(); 
   }
 
   async function toggleTask(id: number, currentStatus: string) {
@@ -76,120 +75,151 @@ export default function Dashboard() {
     fetchData();
   }
 
-  const zStatus = statuses.find(s => s.user_id === "Z") || { status_text: "Offline", is_online: false };
-  const jarvisStatus = statuses.find(s => s.user_id === "JARVIS") || { status_text: "Standby", is_online: true };
+  const zStatus = statuses.find(s => s.user_id === "Z") || { status_text: "OFFLINE", is_online: false };
+  const jarvisStatus = statuses.find(s => s.user_id === "JARVIS") || { status_text: "STANDBY", is_online: true };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-200 font-mono p-6 md:p-12">
-      <header className="mb-12 flex items-center justify-between border-b border-neutral-800 pb-6">
+    <div className="min-h-screen bg-black text-cyan-500 font-mono p-6 md:p-12 selection:bg-cyan-500/30 selection:text-cyan-100 overflow-hidden relative">
+      {/* BACKGROUND GRID */}
+      <div className="fixed inset-0 pointer-events-none opacity-20" 
+           style={{ backgroundImage: 'linear-gradient(rgba(6,182,212,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.1) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+      </div>
+      
+      {/* RADIAL GLOW */}
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-cyan-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+
+      <header className="relative mb-12 flex items-center justify-between border-b border-cyan-900/50 pb-6 backdrop-blur-sm z-10">
         <div className="flex items-center gap-4">
-          <div className="h-3 w-3 rounded-full bg-cyan-500 shadow-[0_0_10px_#06b6d4]"></div>
-          <h1 className="text-2xl font-bold tracking-wider text-white">JARVIS / DASHBOARD</h1>
+          <div className="relative">
+            <div className="h-4 w-4 rounded-full bg-cyan-400 shadow-[0_0_15px_#22d3ee] animate-pulse"></div>
+            <div className="absolute inset-0 h-4 w-4 rounded-full border border-cyan-200 opacity-50 animate-ping"></div>
+          </div>
+          <h1 className="text-3xl font-bold tracking-[0.2em] text-cyan-100 drop-shadow-[0_0_10px_rgba(6,182,212,0.5)]">
+            JARVIS <span className="text-cyan-600 text-lg align-top opacity-80">MK.II</span>
+          </h1>
         </div>
-        <div className="flex items-center gap-4 text-xs text-neutral-500">
-          <span className="flex items-center gap-1">
-            <Clock size={14} /> {new Date().toLocaleTimeString()}
+        <div className="flex flex-col items-end gap-1 text-xs text-cyan-600 font-bold tracking-widest">
+          <span className="flex items-center gap-2">
+            <Clock size={12} /> {new Date().toLocaleTimeString().toUpperCase()}
           </span>
-          <span className="flex items-center gap-1">
-            <Activity size={14} /> SYS_NOMINAL
+          <span className="flex items-center gap-2 text-emerald-400">
+            <Activity size={12} /> SYSTEMS NOMINAL
+          </span>
+          <span className="flex items-center gap-2">
+             SECURE CONNECTION ESTABLISHED
           </span>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <div className="relative grid grid-cols-1 gap-8 lg:grid-cols-2 z-10">
         {/* STATUS MODULES */}
         <section className="col-span-1 lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
            {/* Z Status */}
-           <div className="relative overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900/50 p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-md ${zStatus.is_online ? 'bg-emerald-500/10 text-emerald-500' : 'bg-neutral-800 text-neutral-500'}`}>
-                    <User size={20} />
+           <div className="relative group overflow-hidden rounded-sm border border-cyan-900/50 bg-black/40 p-6 backdrop-blur-md transition-all hover:border-cyan-500/50">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500"></div>
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-500"></div>
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-500"></div>
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500"></div>
+
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className={`p-3 rounded-none border ${zStatus.is_online ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400' : 'border-neutral-800 bg-neutral-900/50 text-neutral-600'}`}>
+                    <User size={24} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-white">OPERATOR (Z)</h3>
-                    <p className="text-xs text-neutral-500">ID: 5354846928</p>
+                    <h3 className="text-xs font-bold tracking-widest text-cyan-700">OPERATOR // Z</h3>
+                    <p className="text-xs text-neutral-500 mt-1">ID: 5354-8469-28</p>
                   </div>
                 </div>
-                <div className={`h-2 w-2 rounded-full ${zStatus.is_online ? 'bg-emerald-500' : 'bg-neutral-600'}`}></div>
+                <div className={`h-2 w-2 rounded-full ${zStatus.is_online ? 'bg-cyan-400 shadow-[0_0_10px_#22d3ee]' : 'bg-neutral-800'}`}></div>
               </div>
-              <div className="mt-4">
-                <p className="text-lg text-neutral-300">"{zStatus.status_text}"</p>
+              <div className="border-t border-cyan-900/30 pt-4">
+                <p className="text-xl font-light text-cyan-100 tracking-wide uppercase">"{zStatus.status_text}"</p>
               </div>
            </div>
 
            {/* JARVIS Status */}
-           <div className="relative overflow-hidden rounded-lg border border-cyan-900/30 bg-neutral-900/50 p-6">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-md bg-cyan-500/10 text-cyan-500">
-                    <Bot size={20} />
+           <div className="relative group overflow-hidden rounded-sm border border-cyan-900/50 bg-black/40 p-6 backdrop-blur-md transition-all hover:border-cyan-500/50">
+              <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-cyan-500"></div>
+              <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-cyan-500"></div>
+              <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-cyan-500"></div>
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-cyan-500"></div>
+
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-none border border-cyan-500 bg-cyan-500/10 text-cyan-400">
+                    <Bot size={24} />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-white">SYSTEM (JARVIS)</h3>
-                    <p className="text-xs text-neutral-500">v1.0.0 / ONLINE</p>
+                    <h3 className="text-xs font-bold tracking-widest text-cyan-700">SYSTEM // JARVIS</h3>
+                    <p className="text-xs text-neutral-500 mt-1">V 2.4.0 // ACTIVE</p>
                   </div>
                 </div>
-                <div className="h-2 w-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4]"></div>
+                <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#22d3ee]"></div>
               </div>
-              <div className="mt-4">
-                <p className="text-lg text-neutral-300">"{jarvisStatus.status_text}"</p>
+              <div className="border-t border-cyan-900/30 pt-4">
+                <p className="text-xl font-light text-cyan-100 tracking-wide uppercase">"{jarvisStatus.status_text}"</p>
               </div>
            </div>
         </section>
 
         {/* TASKS: Z */}
-        <section className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-6">
+        <section className="relative rounded-sm border border-cyan-900/30 bg-black/60 p-6 backdrop-blur-sm">
+          <div className="absolute -top-3 left-4 bg-black px-2 text-xs font-bold tracking-widest text-cyan-600 border border-cyan-900/50">
+            TASK_LIST // Z
+          </div>
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-neutral-400">PENDING TASKS // Z</h2>
-            <span className="rounded bg-neutral-800 px-2 py-0.5 text-xs text-neutral-400">
-              {tasks.filter(t => t.assignee === "Z" && t.status !== "done").length} ACTIVE
-            </span>
+            <span className="text-[10px] text-cyan-800 uppercase tracking-widest">Pending Protocols: {tasks.filter(t => t.assignee === "Z" && t.status !== "done").length}</span>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-2">
             {tasks.filter(t => t.assignee === "Z").map(task => (
-              <div key={task.id} className="group flex items-center justify-between rounded border border-neutral-800 bg-neutral-900 p-3 hover:border-neutral-700 transition-colors">
+              <div key={task.id} className="group relative flex items-center justify-between border-l-2 border-l-neutral-800 bg-neutral-900/20 p-3 hover:bg-cyan-900/10 hover:border-l-cyan-500 transition-all">
                 <div className="flex items-center gap-3">
-                  <button onClick={() => toggleTask(task.id, task.status)} className={`rounded-full p-1 transition-colors ${task.status === 'done' ? 'text-emerald-500' : 'text-neutral-600 hover:text-neutral-400'}`}>
-                    <CheckCircle size={18} className={task.status === 'done' ? 'fill-emerald-500/20' : ''} />
+                  <button onClick={() => toggleTask(task.id, task.status)} className={`transition-colors ${task.status === 'done' ? 'text-emerald-500' : 'text-neutral-600 hover:text-cyan-400'}`}>
+                    {task.status === 'done' ? <CheckCircle size={18} /> : <div className="h-4 w-4 border border-current rounded-sm"></div>}
                   </button>
-                  <span className={`${task.status === 'done' ? 'text-neutral-600 line-through' : 'text-neutral-200'}`}>
+                  <span className={`text-sm tracking-wide ${task.status === 'done' ? 'text-neutral-600 line-through' : 'text-cyan-100'}`}>
                     {task.title}
                   </span>
                 </div>
                 <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 text-neutral-600 hover:text-red-500 transition-opacity">
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             ))}
-            {loading && <div className="text-center text-xs text-neutral-600 animate-pulse">SYNCING...</div>}
+            {tasks.filter(t => t.assignee === "Z").length === 0 && (
+                <div className="text-center py-4 text-xs text-cyan-900 italic">NO ACTIVE PROTOCOLS ASSIGNED</div>
+            )}
           </div>
         </section>
 
         {/* TASKS: JARVIS */}
-        <section className="rounded-xl border border-neutral-800 bg-neutral-900/30 p-6">
+        <section className="relative rounded-sm border border-cyan-900/30 bg-black/60 p-6 backdrop-blur-sm">
+          <div className="absolute -top-3 left-4 bg-black px-2 text-xs font-bold tracking-widest text-cyan-600 border border-cyan-900/50">
+            PROTOCOL_QUEUE // JARVIS
+          </div>
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-cyan-500/80">PROTOCOL QUEUE // JARVIS</h2>
-            <span className="rounded bg-cyan-900/20 px-2 py-0.5 text-xs text-cyan-500">
-              {tasks.filter(t => t.assignee === "JARVIS" && t.status !== "done").length} ACTIVE
-            </span>
+             <span className="text-[10px] text-cyan-800 uppercase tracking-widest">Processing: {tasks.filter(t => t.assignee === "JARVIS" && t.status !== "done").length}</span>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-2">
             {tasks.filter(t => t.assignee === "JARVIS").map(task => (
-              <div key={task.id} className="group flex items-center justify-between rounded border border-neutral-800 bg-neutral-900 p-3 hover:border-cyan-900/50 transition-colors">
+              <div key={task.id} className="group relative flex items-center justify-between border-l-2 border-l-cyan-900/50 bg-cyan-950/10 p-3 hover:bg-cyan-900/20 hover:border-l-cyan-400 transition-all">
                 <div className="flex items-center gap-3">
-                  <button onClick={() => toggleTask(task.id, task.status)} className={`rounded-full p-1 transition-colors ${task.status === 'done' ? 'text-cyan-500' : 'text-neutral-600 hover:text-cyan-500'}`}>
-                    <CheckCircle size={18} className={task.status === 'done' ? 'fill-cyan-500/20' : ''} />
+                  <button onClick={() => toggleTask(task.id, task.status)} className={`transition-colors ${task.status === 'done' ? 'text-cyan-500' : 'text-cyan-700 hover:text-cyan-400'}`}>
+                     {task.status === 'done' ? <CheckCircle size={18} /> : <Cpu size={18} />}
                   </button>
-                  <span className={`${task.status === 'done' ? 'text-neutral-600 line-through' : 'text-cyan-100'}`}>
+                  <span className={`text-sm tracking-wide ${task.status === 'done' ? 'text-cyan-800 line-through' : 'text-cyan-200'}`}>
                     {task.title}
                   </span>
                 </div>
-                <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 text-neutral-600 hover:text-red-500 transition-opacity">
-                  <Trash2 size={16} />
-                </button>
+                <div className="flex items-center gap-2">
+                    {task.status === 'in_progress' && <span className="text-[10px] text-amber-500 animate-pulse">PROCESSING</span>}
+                    <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 text-cyan-800 hover:text-red-500 transition-opacity">
+                    <Trash2 size={14} />
+                    </button>
+                </div>
               </div>
             ))}
           </div>
@@ -197,29 +227,37 @@ export default function Dashboard() {
       </div>
 
       {/* INPUT AREA */}
-      <div className="fixed bottom-0 left-0 w-full border-t border-neutral-800 bg-neutral-950 p-4 md:p-6">
+      <div className="fixed bottom-0 left-0 w-full border-t border-cyan-900/50 bg-black/90 p-4 md:p-6 backdrop-blur-md z-20">
         <div className="mx-auto flex max-w-4xl gap-4">
-          <select 
-            value={assignee} 
-            onChange={(e) => setAssignee(e.target.value as "Z" | "JARVIS")}
-            className="rounded bg-neutral-900 border border-neutral-800 px-4 py-3 text-sm text-neutral-300 focus:outline-none focus:border-cyan-500"
-          >
-            <option value="Z">Assign to Z</option>
-            <option value="JARVIS">Assign to JARVIS</option>
-          </select>
-          <input
-            type="text"
-            value={newTask}
-            onChange={(e) => setNewTask(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && addTask()}
-            placeholder="Initialize new protocol or task..."
-            className="flex-1 rounded bg-neutral-900 border border-neutral-800 px-4 py-3 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-cyan-500"
-          />
+          <div className="relative">
+             <select 
+                value={assignee} 
+                onChange={(e) => setAssignee(e.target.value as "Z" | "JARVIS")}
+                className="appearance-none rounded-none bg-black border border-cyan-800 px-6 py-3 text-sm text-cyan-400 focus:outline-none focus:border-cyan-400 uppercase tracking-widest"
+             >
+                <option value="Z">TARGET: Z</option>
+                <option value="JARVIS">TARGET: JARVIS</option>
+             </select>
+             <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-cyan-800">▼</div>
+          </div>
+          
+          <div className="flex-1 relative group">
+            <input
+                type="text"
+                value={newTask}
+                onChange={(e) => setNewTask(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addTask()}
+                placeholder="ENTER COMMAND OR PROTOCOL..."
+                className="w-full rounded-none bg-black border border-cyan-900/50 px-4 py-3 text-sm text-cyan-100 placeholder-cyan-900 focus:outline-none focus:border-cyan-500 focus:bg-cyan-950/10 transition-all uppercase tracking-wider"
+            />
+            <div className="absolute bottom-0 left-0 h-[1px] w-0 bg-cyan-400 transition-all group-focus-within:w-full"></div>
+          </div>
+
           <button 
             onClick={addTask}
-            className="flex items-center gap-2 rounded bg-white px-6 py-3 text-sm font-bold text-black hover:bg-neutral-200 transition-colors"
+            className="flex items-center gap-2 rounded-none bg-cyan-900/20 border border-cyan-500/50 px-6 py-3 text-sm font-bold text-cyan-400 hover:bg-cyan-500 hover:text-black hover:shadow-[0_0_15px_#22d3ee] transition-all tracking-widest"
           >
-            <Plus size={16} /> ADD
+            <Plus size={16} /> EXECUTE
           </button>
         </div>
       </div>
