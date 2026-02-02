@@ -143,7 +143,7 @@ export default function Dashboard() {
             {/* Task List */}
             <div className="flex-1 font-mono text-sm text-gray-300 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
                {tasks.length === 0 && (
-                   <div className="opacity-50 text-center mt-10">> NO_ACTIVE_PROTOCOLS</div>
+                   <div className="opacity-50 text-center mt-10">&gt; NO_ACTIVE_PROTOCOLS</div>
                )}
                {tasks.map(task => (
                    <div key={task.id} className={`group flex items-start gap-3 py-2 border-b border-gray-900/50 ${task.status === 'done' ? 'opacity-40' : ''}`}>
