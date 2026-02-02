@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "./supabase";
-import { Activity, CheckCircle, Clock, Plus, Trash2, Edit2, User, Bot, RefreshCw, Cpu, Shield, Zap, Save, X, Globe, Terminal, Wifi, Battery, Server } from "lucide-react";
+import { Activity, CheckCircle, Clock, Plus, Trash2, Edit2, User, Bot, RefreshCw, Cpu, Shield, Zap, Save, X, Globe, Terminal, Wifi, Battery, Server, Eye, EyeOff } from "lucide-react";
 import JarvisCore from "./JarvisCore";
 
 type Task = {
@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+  const [showCompleted, setShowCompleted] = useState(false);
   const [time, setTime] = useState(new Date());
 
   // Clock
@@ -221,21 +222,31 @@ export default function Dashboard() {
         <div className="lg:col-span-8 flex flex-col gap-6 h-full">
             
             {/* TABS / HEADERS */}
-            <div className="flex items-end border-b border-cyan-900/30 pb-2 gap-6">
-                <div className="text-sm font-bold tracking-[0.2em] text-cyan-400 flex items-center gap-2">
-                    <Terminal size={16}/> ACTIVE PROTOCOLS
+            <div className="flex items-center justify-between border-b border-cyan-900/30 pb-2">
+                <div className="flex items-end gap-6">
+                    <div className="text-sm font-bold tracking-[0.2em] text-cyan-400 flex items-center gap-2">
+                        <Terminal size={16}/> PROTOCOLS
+                    </div>
+                    <div className="text-xs font-mono text-cyan-700 hidden sm:block">
+                        PENDING: {tasks.filter(t => t.status !== 'done').length}
+                    </div>
                 </div>
-                <div className="text-xs font-mono text-cyan-700">
-                    PENDING: {tasks.filter(t => t.status !== 'done').length}
-                </div>
+                
+                <button 
+                    onClick={() => setShowCompleted(!showCompleted)}
+                    className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-cyan-700 hover:text-cyan-400 transition-colors uppercase"
+                >
+                    {showCompleted ? <EyeOff size={14}/> : <Eye size={14}/>}
+                    {showCompleted ? 'HIDE ARCHIVED' : 'SHOW ARCHIVED'}
+                </button>
             </div>
 
             <div className="flex-1 overflow-y-auto pr-2 space-y-4 max-h-[60vh] lg:max-h-none scrollbar-thin">
                 {/* JARVIS TASKS */}
-                {tasks.filter(t => t.assignee === "JARVIS").length > 0 && (
+                {tasks.filter(t => t.assignee === "JARVIS" && (showCompleted || t.status !== 'done')).length > 0 && (
                     <div className="space-y-2">
                         <div className="text-[10px] uppercase tracking-widest text-cyan-800 mb-2 pl-2 border-l-2 border-cyan-600">JARVIS Processing Queue</div>
-                        {tasks.filter(t => t.assignee === "JARVIS").map(task => (
+                        {tasks.filter(t => t.assignee === "JARVIS" && (showCompleted || t.status !== 'done')).map(task => (
                             <TaskItem 
                                 key={task.id} 
                                 task={task} 
@@ -255,7 +266,7 @@ export default function Dashboard() {
                 {/* Z TASKS */}
                  <div className="space-y-2 mt-4">
                     <div className="text-[10px] uppercase tracking-widest text-neutral-600 mb-2 pl-2 border-l-2 border-neutral-600">Operator Objectives</div>
-                    {tasks.filter(t => t.assignee === "Z").map(task => (
+                    {tasks.filter(t => t.assignee === "Z" && (showCompleted || t.status !== 'done')).map(task => (
                         <TaskItem 
                             key={task.id} 
                             task={task} 
@@ -269,7 +280,7 @@ export default function Dashboard() {
                             onCancel={cancelEditing}
                         />
                     ))}
-                    {tasks.filter(t => t.assignee === "Z").length === 0 && (
+                    {tasks.filter(t => t.assignee === "Z" && (showCompleted || t.status !== 'done')).length === 0 && (
                         <div className="text-center py-8 border border-dashed border-neutral-800 text-neutral-700 text-xs tracking-widest">
                             NO OBJECTIVES ASSIGNED
                         </div>
